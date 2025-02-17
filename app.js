@@ -1,15 +1,20 @@
 import createError from 'http-errors';
 import express from 'express';
 import path from 'path';
+import { fileURLToPath } from 'url'; // Import fileURLToPath
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 
 // import indexRouter from './routes/index';
 // import usersRouter from './routes/users';
-import loginRouter from './routes/Controller/Auth';
+import loginRouter from './routes/Controller/Auth.js';
 // import authRouter from './routes/Controller/protectedRoutes';
 
 const app = express();
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url); // Get the file path of the current module
+const __dirname = path.dirname(__filename); // Get the directory name
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
