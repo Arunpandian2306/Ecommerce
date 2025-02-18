@@ -6,9 +6,11 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const generateToken = (user) => {
-  return jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
-    expiresIn: "1h",
-  });
+  return jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "1h" }
+  );
 };
 
 export const register = async (req, res) => {
@@ -70,29 +72,32 @@ export const login = async (req, res) => {
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      return res
-        .status(401)
-        .json({ error: "Invalid credentials: User not found" });
+      return res.status(401).json({ error: "Invalid credentials: User not found" });
     }
+
     const trimmedPassword = password.trim();
     console.log("Password during login:", trimmedPassword);
     console.log("Stored hash during login:", user.password_hash);
-    const isValidPassword = await bcrypt.compare(
-      trimmedPassword,
-      user.password_hash
-    );
+
+    const isValidPassword = await bcrypt.compare(trimmedPassword, user.password_hash);
 
     if (!isValidPassword) {
-      return res
-        .status(401)
-        .json({ error: "Invalid credentials: Incorrect password" });
+      return res.status(401).json({ error: "Invalid credentials: Incorrect password" });
     }
-    const accessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "15m",
-    });
-    const refreshToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+
+    // Generate tokens
+    const accessToken = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "15m" }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: user.id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
     const token = generateToken(user);
 
     res.status(200).json({
@@ -111,3 +116,4 @@ export const login = async (req, res) => {
     res.status(500).json({ error: "An error occurred while logging in" });
   }
 };
+
