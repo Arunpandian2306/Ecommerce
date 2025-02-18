@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import bcrypt from "bcrypt";
 import { sequelize } from "../DBConfig/connection.js";
 
-const User = sequelize.define(
+const UserModel = sequelize.define(
   "User",
   {
     id: {
@@ -37,9 +37,9 @@ const User = sequelize.define(
   }
 );
 
-User.beforeCreate(async (user) => {
+UserModel.beforeCreate(async (user) => {
   const salt = await bcrypt.genSalt(10);
   user.password_hash = await bcrypt.hash(user.password_hash, salt);
 });
 
-export default User;
+export default UserModel;

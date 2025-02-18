@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../DBConfig/connection.js";
 
-const Product = sequelize.define(
+const ProductModel = sequelize.define(
   "Product",
   {
     id: {
@@ -30,7 +30,7 @@ const Product = sequelize.define(
     },
     categoryId: {
       type: DataTypes.INTEGER,
-      field: "category_id", // 👈 Maps camelCase to snake_case
+      field: "category_id",
       references: {
         model: "categories",
         key: "id",
@@ -38,14 +38,14 @@ const Product = sequelize.define(
     },
     imageUrl: {
       type: DataTypes.TEXT,
-      field: "image_url", // 👈 Ensures correct column name
+      field: "image_url",
     },
   },
   {
     tableName: "products",
     timestamps: false,
-    underscored: true, // 👈 Forces snake_case column names
+    underscored: true,
   }
 );
 
-export default Product;
+export default ProductModel;

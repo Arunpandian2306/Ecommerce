@@ -10,7 +10,7 @@ import logger from "morgan";
 import loginRouter from "./routes/Controller/Auth.js";
 import ProductRouter from "./routes/Controller/Product.js";
 import CatagoryRouter from "./routes/Controller/Catagory.js";
-import CartRouter from "./routes/Controller/Shop.js";
+// import CartRouter from "./routes/Controller/Shop.js";
 // import protectedRoutes from "./routes/Controller/protectedRoutes.js";
 // import authRouter from './routes/Controller/protectedRoutes';
 
@@ -35,7 +35,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api", loginRouter);
 app.use("/product", ProductRouter);
 app.use("/catagory", CatagoryRouter);
-app.use("/cart", CartRouter);
+// app.use("/cart", CartRouter);
 // app.use("/admin", protectedRoutes);
 // app.use('/authRouter', authRouter);
 

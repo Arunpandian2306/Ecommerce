@@ -1,4 +1,4 @@
-import CategoryModel from "../Models/category.js";
+import CategoryModel from "../Models/CategoryModel.js";
 
 export const createCategory = async (req, res) => {
   try {
@@ -11,11 +11,12 @@ export const createCategory = async (req, res) => {
     const category = await CategoryModel.create({ name, description });
     res.status(201).json(category);
   } catch (error) {
-    console.error("Error creating category:", error);  // Add this line for debugging
-    res.status(500).json({ message: "Error creating category", error: error.message });
+    console.error("Error creating category:", error);
+    res
+      .status(500)
+      .json({ message: "Error creating category", error: error.message });
   }
 };
-
 
 export const updateCategory = async (req, res) => {
   try {
