@@ -1,6 +1,7 @@
 import Product from "../Models/product.js";
 import cloudinaryPkg from "cloudinary"; // ✅ Import Cloudinary properly
 const cloudinary = cloudinaryPkg.v2;
+import { Op } from "sequelize"; // ✅ Import this
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -8,7 +9,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// 🟢 Create Product
+
 export const createProduct = async (req, res) => {
   try {
     const { name, description, price, stock, categoryId } = req.body;
@@ -30,15 +31,17 @@ export const createProduct = async (req, res) => {
       description,
       price,
       stock,
-      categoryId,
-      imageUrl,
+      categoryId, // Matches field in model
+      imageUrl, // Matches field in model
     });
 
     res.status(201).json({ message: "Product created", product });
   } catch (error) {
-    res.status(500).json({ message: "Error creating product", error });
+    console.error("❌ Error creating product:", error);
+    res.status(500).json({ message: "Error creating product", error: error.message });
   }
 };
+
 
 // 🔵 Update Product
 export const updateProduct = async (req, res) => {
@@ -102,3 +105,57 @@ export const listProducts = async (req, res) => {
     res.status(500).json({ message: "Error fetching products", error });
   }
 };
+
+
+
+export const getProducts = async (req, res) => {
+  try {
+    const { search, category, minPrice, maxPrice, page = 1, limit = 10, sortBy = 'price', sortOrder = 'asc' } = req.query;
+
+    const whereCondition = {};
+
+    // 🔍 Search by Product Name
+    if (search) {
+      whereCondition.name = { [Op.iLike]: `%${search}%` }; // Case-insensitive search
+    }
+
+    // 🎯 Filter by Category
+    if (category) {
+      whereCondition.category_id = category;
+    }
+
+    // 💰 Filter by Price Range
+    if (minPrice && maxPrice) {
+      whereCondition.price = { [Op.between]: [parseFloat(minPrice), parseFloat(maxPrice)] };
+    } else if (minPrice) {
+      whereCondition.price = { [Op.gte]: parseFloat(minPrice) };
+    } else if (maxPrice) {
+      whereCondition.price = { [Op.lte]: parseFloat(maxPrice) };
+    }
+
+    // 📝 Pagination
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const order = [[sortBy, sortOrder.toLowerCase() === 'desc' ? 'DESC' : 'ASC']];
+
+    // 📦 Fetch Products
+    const { count, rows: products } = await Product.findAndCountAll({
+      where: whereCondition,
+      limit: parseInt(limit),
+      offset: offset,
+      order: order,
+    });
+
+    // 🏁 Response
+    res.json({
+      totalProducts: count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page),
+      products,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching products", error });
+  }
+};
+
+
