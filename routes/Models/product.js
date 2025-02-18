@@ -1,15 +1,13 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes } from "sequelize";
 import { sequelize } from "../DBConfig/connection.js";
-import Category from "./category.js";
 
-class Product extends Model {}
-
-Product.init(
+const Product = sequelize.define(
+  "Product",
   {
     id: {
       type: DataTypes.INTEGER,
-      autoIncrement: true,
       primaryKey: true,
+      autoIncrement: true,
     },
     name: {
       type: DataTypes.STRING,
@@ -20,11 +18,8 @@ Product.init(
       allowNull: true,
     },
     price: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.DOUBLE,
       allowNull: false,
-      validate: {
-        min: 0,
-      },
     },
     stock: {
       type: DataTypes.INTEGER,
@@ -35,27 +30,22 @@ Product.init(
     },
     categoryId: {
       type: DataTypes.INTEGER,
+      field: "category_id", // 👈 Maps camelCase to snake_case
       references: {
-        model: Category,
+        model: "categories",
         key: "id",
       },
-      onDelete: "SET NULL",
     },
     imageUrl: {
-      type: DataTypes.STRING,
-      field: "image_url", // Ensure this matches the database column name
-      allowNull: true,
+      type: DataTypes.TEXT,
+      field: "image_url", // 👈 Ensures correct column name
     },
   },
   {
-    sequelize,
-    modelName: "Product",
     tableName: "products",
     timestamps: false,
+    underscored: true, // 👈 Forces snake_case column names
   }
 );
-
-Product.belongsTo(Category, { foreignKey: "categoryId" });
-Category.hasMany(Product, { foreignKey: "categoryId" });
 
 export default Product;
