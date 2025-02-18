@@ -1,4 +1,4 @@
-import Category from "../models/Category";
+import CategoryModel from "../Models/category.js";
 
 export const createCategory = async (req, res) => {
   try {
@@ -8,19 +8,21 @@ export const createCategory = async (req, res) => {
       return res.status(400).json({ message: "Name is required" });
     }
 
-    const category = await Category.create({ name, description });
+    const category = await CategoryModel.create({ name, description });
     res.status(201).json(category);
   } catch (error) {
-    res.status(500).json({ message: "Error creating category", error });
+    console.error("Error creating category:", error);  // Add this line for debugging
+    res.status(500).json({ message: "Error creating category", error: error.message });
   }
 };
+
 
 export const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description } = req.body;
 
-    const category = await Category.findByPk(id);
+    const category = await CategoryModel.findByPk(id);
     if (!category) {
       return res.status(404).json({ message: "Category not found" });
     }
@@ -39,7 +41,7 @@ export const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const category = await Category.findByPk(id);
+    const category = await CategoryModel.findByPk(id);
     if (!category) {
       return res.status(404).json({ message: "Category not found" });
     }
@@ -53,7 +55,7 @@ export const deleteCategory = async (req, res) => {
 
 export const listCategories = async (_req, res) => {
   try {
-    const categories = await Category.findAll();
+    const categories = await CategoryModel.findAll();
     res.json(categories);
   } catch (error) {
     res.status(500).json({ message: "Error retrieving categories", error });
