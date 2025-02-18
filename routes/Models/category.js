@@ -1,31 +1,24 @@
-import { DataTypes, Model } from "sequelize";
-import { sequelize } from "../DBConfig/connection.js";
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../DBConfig/connection.js'; // Adjust the import path as needed
 
-class Category extends Model {}
-
-Category.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
+const CategoryModel = sequelize.define('Category', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
   },
-  {
-    sequelize,
-    modelName: "Category",
-    tableName: "categories",
-    timestamps: false,
-  }
-);
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+}, {
+  tableName: 'categories', // Optional: Define the table name explicitly
+  timestamps: true, // Optional: Enable createdAt and updatedAt fields
+});
 
-export default Category;
+export default CategoryModel;
