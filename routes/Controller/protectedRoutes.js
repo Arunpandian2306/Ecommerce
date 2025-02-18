@@ -1,17 +1,19 @@
 import express from "express";
 import {
-  authenticateUser,
-  authorizeAdmin,
-} from "../Middleware/authenticateJWT.js";
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  listProducts,
+} from "../Services/ProductService.js";
+// import { authenticateUser, authorizeAdmin } from "../Middleware/authenticateJWT.js";
+import upload from "../Middleware/uploadMiddleware.js";
 
 const router = express.Router();
 
-router.get("/admin/dashboard", authenticateUser, authorizeAdmin, (req, res) => {
-  res.json({ message: "Welcome to Admin Dashboard" });
-});
-
-router.get("/customer/dashboard", authenticateUser, (req, res) => {
-  res.json({ message: "Welcome to Customer Dashboard" });
-});
+// Apply authenticateUser before authorizeAdmin
+router.post("/create", upload.single("image"), createProduct);
+router.put("/:id", upload.single("image"), updateProduct);
+router.delete("/:id", deleteProduct);
+router.get("/list", listProducts);
 
 export default router;

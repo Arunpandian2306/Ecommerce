@@ -36,7 +36,7 @@ export const register = async (req, res) => {
         password_hash: hashedPassword,
         role: role || "customer",
       },
-      { hooks: false },
+      { hooks: false }
     );
 
     console.log("User after creation:", newUser.toJSON());
@@ -79,7 +79,7 @@ export const login = async (req, res) => {
     console.log("Stored hash during login:", user.password_hash);
     const isValidPassword = await bcrypt.compare(
       trimmedPassword,
-      user.password_hash,
+      user.password_hash
     );
 
     if (!isValidPassword) {
@@ -87,11 +87,19 @@ export const login = async (req, res) => {
         .status(401)
         .json({ error: "Invalid credentials: Incorrect password" });
     }
+    const accessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "15m",
+    });
+    const refreshToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
     const token = generateToken(user);
 
     res.status(200).json({
       message: "Login successful",
       token,
+      accessToken,
+      refreshToken,
       user: {
         id: user.id,
         email: user.email,

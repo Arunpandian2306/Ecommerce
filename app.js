@@ -8,6 +8,8 @@ import logger from "morgan";
 // import indexRouter from './routes/index';
 // import usersRouter from './routes/users';
 import loginRouter from "./routes/Controller/Auth.js";
+import ProductRouter from "./routes/Controller/Product.js";
+// import protectedRoutes from "./routes/Controller/protectedRoutes.js";
 // import authRouter from './routes/Controller/protectedRoutes';
 
 const app = express();
@@ -29,6 +31,8 @@ app.use(express.static(path.join(__dirname, "public")));
 // app.use('/', indexRouter);
 // app.use('/users', usersRouter);
 app.use("/api", loginRouter);
+app.use("/product", ProductRouter);
+// app.use("/admin", protectedRoutes);
 // app.use('/authRouter', authRouter);
 
 // catch 404 and forward to error handler

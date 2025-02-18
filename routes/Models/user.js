@@ -34,10 +34,9 @@ const User = sequelize.define(
   {
     timestamps: true,
     tableName: "users",
-  },
+  }
 );
 
-// Hash password before saving
 User.beforeCreate(async (user) => {
   const salt = await bcrypt.genSalt(10);
   user.password_hash = await bcrypt.hash(user.password_hash, salt);

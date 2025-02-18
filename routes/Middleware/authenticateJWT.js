@@ -18,7 +18,7 @@ export const authenticateUser = (req, res, next) => {
   }
 };
 export const authorizeAdmin = (req, res, next) => {
-  if (req.user.role !== "admin") {
+  if (res.user.role !== "admin") {
     return res.status(403).json({ error: "Access denied. Admins only." });
   }
   next();

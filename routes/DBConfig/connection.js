@@ -21,7 +21,7 @@ const sequelize = new Sequelize(
       idle: 10000,
     },
     logging: process.env.DB_LOGGING === "true",
-  },
+  }
 );
 
 const connectDB = async () => {
