@@ -29,7 +29,7 @@ paths:
                   format: password
                   example: admin1Password
       responses:
-        '200':
+        "200":
           description: User registered successfully
           content:
             application/json:
@@ -58,9 +58,9 @@ paths:
                       role:
                         type: string
                         example: customer
-        '400':
+        "400":
           description: Bad request, invalid input data
-        '409':
+        "409":
           description: Conflict, user already exists
   /login:
     post:
@@ -82,7 +82,7 @@ paths:
                   format: password
                   example: securepassword123
       responses:
-        '200':
+        "200":
           description: Login successful
           content:
             application/json:
@@ -114,7 +114,7 @@ paths:
                       role:
                         type: string
                         example: admin
-        '400':
+        "400":
           description: Invalid credentials
   /category/create:
     post:
@@ -134,7 +134,7 @@ paths:
                   type: string
                   example: Category for toy products
       responses:
-        '200':
+        "200":
           description: Category created successfully
           content:
             application/json:
@@ -158,14 +158,14 @@ paths:
                     type: string
                     format: date-time
                     example: 2025-02-18T07:50:55.451Z
-        '400':
+        "400":
           description: Bad request, invalid input data
   /category/list:
     get:
       summary: Retrieve list of categories
       description: This endpoint returns all available categories.
       responses:
-        '200':
+        "200":
           description: A list of categories.
           content:
             application/json:
@@ -223,7 +223,7 @@ paths:
                   description: The updated description of the category.
                   example: "Updated category description"
       responses:
-        '200':
+        "200":
           description: The updated category details.
           content:
             application/json:
@@ -263,7 +263,7 @@ paths:
             type: integer
           description: The ID of the category to be deleted.
       responses:
-        '200':
+        "200":
           description: Confirmation message that the category was deleted.
           content:
             application/json:
@@ -310,7 +310,7 @@ paths:
                   format: binary
                   description: The product image to be uploaded.
       responses:
-        '200':
+        "200":
           description: The newly created product with the uploaded image URL.
           content:
             application/json:
@@ -339,7 +339,7 @@ paths:
                   imageUrl:
                     type: string
                     example: "https://example.com/images/product_a.png"
-        '400':
+        "400":
           description: Invalid input or missing required fields
   /product/getProducts:
     get:
@@ -367,7 +367,7 @@ paths:
             example: 0
           description: The starting point from which to fetch products.
       responses:
-        '200':
+        "200":
           description: A list of products with the requested filters.
           content:
             application/json:
@@ -397,9 +397,9 @@ paths:
                     imageUrl:
                       type: string
                       example: "https://example.com/images/product_a.png"
-        '400':
+        "400":
           description: Invalid filter parameters
-        '404':
+        "404":
           description: No products found matching the criteria
   /product/{id}:
     get:
@@ -413,7 +413,7 @@ paths:
             type: integer
           description: The ID of the product to retrieve.
       responses:
-        '200':
+        "200":
           description: The details of the requested product.
           content:
             application/json:
@@ -441,7 +441,7 @@ paths:
                   imageUrl:
                     type: string
                     example: "https://example.com/images/product_a.png"
-        '404':
+        "404":
           description: Product not found
   /product/{_id}:
     put:
@@ -477,7 +477,7 @@ paths:
                   type: integer
                   example: 2
       responses:
-        '200':
+        "200":
           description: The updated product details.
           content:
             application/json:
@@ -502,7 +502,7 @@ paths:
                   categoryId:
                     type: integer
                     example: 2
-        '400':
+        "400":
           description: Bad request due to invalid data
   /product/{:id}:
     delete:
@@ -516,7 +516,7 @@ paths:
             type: integer
           description: The ID of the product to be deleted.
       responses:
-        '200':
+        "200":
           description: Confirmation message that the product was deleted.
           content:
             application/json:
