@@ -38,7 +38,7 @@ export const placeOrder = async (req, res) => {
 
     res.json({ message: "Order placed successfully", orderId: newOrder.id });
   } catch (error) {
-    res.status(500).json({ message: "Error placing order", error });
+    res.status(422).json({ message: "Error placing order", error });
   }
 };
 
@@ -66,6 +66,6 @@ export const viewOrderHistory = async (req, res) => {
     res.json(orders);
   } catch (error) {
     console.error("Error retrieving order history:", error);
-    res.status(500).json({ message: "Error retrieving order history", error });
+    res.status(422).json({ message: "Error retrieving order history", error });
   }
 };

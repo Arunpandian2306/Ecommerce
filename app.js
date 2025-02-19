@@ -33,7 +33,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // app.use('/', indexRouter);
 // app.use('/users', usersRouter);
-app.use("/api", loginRouter);
+app.use("/auth", loginRouter);
 app.use("/product", ProductRouter);
 app.use("/catagory", CatagoryRouter);
 app.use("/cart", CartRouter);

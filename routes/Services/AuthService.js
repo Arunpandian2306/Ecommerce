@@ -25,7 +25,7 @@ export const register = async (req, res) => {
   try {
     const existingUser = await UserModel.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({ error: "Email is already in use" });
+      return res.status(409).json({ error: "Email is already in use" });
     }
 
     const trimmedPassword = password.trim();
@@ -72,9 +72,7 @@ export const login = async (req, res) => {
     const user = await UserModel.findOne({ where: { email } });
 
     if (!user) {
-      return res
-        .status(401)
-        .json({ error: "Invalid credentials: User not found" });
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
     const trimmedPassword = password.trim();
@@ -87,9 +85,7 @@ export const login = async (req, res) => {
     );
 
     if (!isValidPassword) {
-      return res
-        .status(401)
-        .json({ error: "Invalid credentials: Incorrect password" });
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
     const accessToken = jwt.sign(
@@ -132,7 +128,7 @@ export const createAdmin = async (req, res) => {
   try {
     const existingUser = await UserModel.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({ error: "Email is already in use" });
+      return res.status(409).json({ error: "Email is already in use" });
     }
 
     const trimmedPassword = password.trim();
@@ -153,7 +149,7 @@ export const createAdmin = async (req, res) => {
     const token = generateToken(newUser);
 
     res.status(201).json({
-      message: "User registered successfully",
+      message: "Admin registered successfully",
       token,
       user: {
         id: newUser.id,

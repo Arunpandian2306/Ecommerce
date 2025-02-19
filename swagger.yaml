@@ -6,10 +6,12 @@ info:
 servers:
   - url: http://localhost:3000/api
 paths:
-  /register:
+  /auth/register:
     post:
       summary: Register a new user
       description: Creates a new user account and returns an authentication token.
+      tags:
+        - Auth
       requestBody:
         required: true
         content:
@@ -59,13 +61,18 @@ paths:
                         type: string
                         example: customer
         "400":
-          description: Bad request, invalid input data
+          description: All fields (username, email, password) are required
+
         "409":
-          description: Conflict, user already exists
-  /login:
+          description: Email is already in use
+        "500":
+          description: An error occurred while registering user
+  /auth/login:
     post:
       summary: User Login
       description: Authenticates a user and returns access tokens.
+      tags:
+        - Auth
       requestBody:
         required: true
         content:
@@ -115,11 +122,19 @@ paths:
                         type: string
                         example: admin
         "400":
+          description: Email and password are required
+        "401":
           description: Invalid credentials
+        "500":
+          description: An error occurred while logging in
   /category/create:
     post:
       summary: Create a new category
       description: Creates a new product category.
+      tags:
+        - Category
+      security:
+        - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -158,12 +173,16 @@ paths:
                     type: string
                     format: date-time
                     example: 2025-02-18T07:50:55.451Z
-        "400":
-          description: Bad request, invalid input data
+        "422":
+          description: Error creating category
   /category/list:
     get:
       summary: Retrieve list of categories
       description: This endpoint returns all available categories.
+      tags:
+        - Category
+      security:
+        - BearerAuth: []
       responses:
         "200":
           description: A list of categories.
@@ -196,10 +215,16 @@ paths:
                       format: date-time
                       description: The timestamp when the category was last updated.
                       example: "2025-02-18T07:50:07.823Z"
+        "422":
+          description: Error retrieving categories
   /category/{id}:
     put:
       summary: Update a category by ID
       description: This endpoint updates the details of an existing category based on the provided ID.
+      tags:
+        - Category
+      security:
+        - BearerAuth: []
       parameters:
         - in: path
           name: id
@@ -252,9 +277,18 @@ paths:
                     format: date-time
                     description: The timestamp when the category was last updated.
                     example: "2025-02-18T14:04:44.219Z"
+        "404":
+          description: Category not found
+        "422":
+          description: Error updating category
+
     delete:
       summary: Delete a category by ID
       description: This endpoint deletes the category with the specified ID.
+      tags:
+        - Category
+      security:
+        - BearerAuth: []
       parameters:
         - in: path
           name: id
@@ -273,10 +307,18 @@ paths:
                   message:
                     type: string
                     example: "Category deleted successfully"
+        "404":
+          description: Category not found
+        "422":
+          description: Error deleting category
   /product/create:
     post:
       summary: Create a new product
       description: This endpoint creates a new product and uploads an image.
+      tags:
+        - Product Management
+      security:
+        - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -340,71 +382,130 @@ paths:
                     type: string
                     example: "https://example.com/images/product_a.png"
         "400":
-          description: Invalid input or missing required fields
+          description: Missing required fields
+        "422":
+          description: Error creating product
+
   /product/getProducts:
     get:
-      summary: Retrieve a list of products
-      description: This endpoint retrieves a list of all products with optional filters.
+      summary: Get filtered products
+      description: Retrieve products based on search, category, price range, pagination, and sorting.
+      tags:
+        - Product List
+      security:
+        - BearerAuth: []
       parameters:
-        - in: query
-          name: categoryId
+        - name: search
+          in: query
+          description: Search products by name
+          required: false
+          schema:
+            type: string
+            example: "Product"
+        - name: category
+          in: query
+          description: Search products by categoryId
+          required: false
+          schema:
+            type: number
+            example: 2
+        - name: minPrice
+          in: query
+          description: Minimum price filter
+          required: false
+          schema:
+            type: number
+            example: 100
+        - name: maxPrice
+          in: query
+          description: Maximum price filter
+          required: false
+          schema:
+            type: number
+            example: 1000
+        - name: page
+          in: query
+          description: Page number for pagination
           required: false
           schema:
             type: integer
-          description: Filter products by category ID.
-        - in: query
-          name: limit
+            example: 1
+        - name: limit
+          in: query
+          description: Number of products per page
           required: false
           schema:
             type: integer
-            example: 10
-          description: The number of products to return.
-        - in: query
-          name: offset
+            example: 3
+        - name: sortBy
+          in: query
+          description: Sort products by a field (e.g., price, name)
           required: false
           schema:
-            type: integer
-            example: 0
-          description: The starting point from which to fetch products.
+            type: string
+            example: "price"
+        - name: sortOrder
+          in: query
+          description: Sort order (asc/desc)
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            example: "desc"
       responses:
         "200":
-          description: A list of products with the requested filters.
+          description: Successfully retrieved filtered products
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      example: 101
-                    name:
-                      type: string
-                      example: "Product A"
-                    description:
-                      type: string
-                      example: "High-quality product"
-                    price:
-                      type: number
-                      example: 199.99
-                    stock:
-                      type: integer
-                      example: 10
-                    categoryId:
-                      type: integer
-                      example: 1
-                    imageUrl:
-                      type: string
-                      example: "https://example.com/images/product_a.png"
-        "400":
-          description: Invalid filter parameters
-        "404":
-          description: No products found matching the criteria
+                type: object
+                properties:
+                  totalProducts:
+                    type: integer
+                    example: 3
+                  totalPages:
+                    type: integer
+                    example: 1
+                  currentPage:
+                    type: integer
+                    example: 1
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        name:
+                          type: string
+                          example: "Product A"
+                        description:
+                          type: string
+                          example: "High-quality product"
+                        price:
+                          type: number
+                          example: 199.99
+                        stock:
+                          type: integer
+                          example: 10
+                        categoryId:
+                          type: integer
+                          nullable: true
+                          example: 2
+                        imageUrl:
+                          type: string
+                          example: "https://res.cloudinary.com/du0o9yluc/image/upload/v1739884825/products/mhky2uvzlwyz4wcodluv.png"
+        "422":
+          description: Error fetching products
   /product/{id}:
     get:
       summary: Get product details by ID
       description: This endpoint retrieves the details of a product by its ID.
+      tags:
+        - Product Management
+      security:
+        - BearerAuth: []
       parameters:
         - in: path
           name: id
@@ -441,12 +542,16 @@ paths:
                   imageUrl:
                     type: string
                     example: "https://example.com/images/product_a.png"
-        "404":
-          description: Product not found
+        "422":
+          description: Error fetching products
   /product/{_id}:
     put:
       summary: Update an existing product
       description: This endpoint updates the details of an existing product by its ID.
+      tags:
+        - Product Management
+      security:
+        - BearerAuth: []
       parameters:
         - in: path
           name: _id
@@ -502,12 +607,18 @@ paths:
                   categoryId:
                     type: integer
                     example: 2
-        "400":
-          description: Bad request due to invalid data
+        "404":
+          description: Product not found
+        "422":
+          description: Error updating product
   /product/{:id}:
     delete:
       summary: Delete a product by ID
       description: This endpoint deletes a product by its ID.
+      tags:
+        - Product Management
+      security:
+        - BearerAuth: []
       parameters:
         - in: path
           name: :id
@@ -526,3 +637,390 @@ paths:
                   message:
                     type: string
                     example: "Product deleted successfully"
+        "404":
+          description: Product not found
+        "422":
+          description: Error deleting product
+  /cart/create:
+    post:
+      summary: Add a product to the cart
+      description: Adds a specified product to the user's cart.
+      tags:
+        - Shopping Cart
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - productId
+                - quantity
+              properties:
+                userId:
+                  type: integer
+                  example: 2
+                productId:
+                  type: integer
+                  example: 3
+                quantity:
+                  type: integer
+                  example: 1
+      responses:
+        "200":
+          description: Product added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Product added to cart successfully"
+        "404":
+          description: Product not found
+        "422":
+          description: Error adding to cart
+  /cart/update:
+    put:
+      summary: Update cart quantity
+      description: Updates the quantity of an existing product in the user's cart.
+      tags:
+        - Shopping Cart
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - productId
+                - quantity
+              properties:
+                userId:
+                  type: integer
+                  example: 2
+                productId:
+                  type: integer
+                  example: 1
+                quantity:
+                  type: integer
+                  example: 3
+      responses:
+        "200":
+          description: Cart quantity updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Cart quantity updated successfully"
+        "404":
+          description: Cart item not found
+        "422":
+          description: Error updating cart quantity
+  /cart/{userId}:
+    get:
+      summary: Get cart items by user ID
+      description: Retrieves all cart items for a specific user.
+      tags:
+        - Shopping Cart
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 2
+      responses:
+        "200":
+          description: Successfully retrieved cart items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 3
+                    userId:
+                      type: integer
+                      example: 2
+                    productId:
+                      type: integer
+                      example: 1
+                    quantity:
+                      type: integer
+                      example: 3
+                    createdAt:
+                      type: string
+                      format: date-time
+                      example: "2025-02-19T08:29:01.470Z"
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      example: "2025-02-19T08:29:22.775Z"
+                    product:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        name:
+                          type: string
+                          example: "Product A"
+                        description:
+                          type: string
+                          example: "High-quality product"
+                        price:
+                          type: number
+                          format: float
+                          example: 199.99
+                        stock:
+                          type: integer
+                          example: 10
+                        categoryId:
+                          type: integer
+                          nullable: true
+                          example: null
+                        imageUrl:
+                          type: string
+                          example: "https://res.cloudinary.com/du0o9yluc/image/upload/v1739884825/products/mhky2uvzlwyz4wcodluv.png"
+                    totalPrice:
+                      type: number
+                      format: float
+                      example: 599.97
+        "422":
+          description: Error retrieving cart
+  /cart/{cartId}:
+    delete:
+      summary: Delete cart item by ID
+      description: Removes a specific item from the cart.
+      tags:
+        - Shopping Cart
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 2
+      responses:
+        "200":
+          description: Item removed from cart
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Item removed from cart"
+        "400":
+          description: cartId is required
+        "404":
+          description: Item not found in cart
+        "422":
+          description: Error removing item
+  /order/place:
+    post:
+      summary: Place an order from the cart
+      description: Places an order for a user using items from their cart.
+      tags:
+        - Order
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                  example: 2
+      responses:
+        "200":
+          description: Order placed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Order placed successfully"
+                  orderId:
+                    type: integer
+                    example: 1
+        "400":
+          description: Cart is empty
+        "422":
+          description: Error placing order
+  /order/history/{userId}:
+    get:
+      summary: Get order history by user ID
+      description: Retrieves a list of past orders for the specified user.
+      tags:
+        - Order
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          example: 2
+      responses:
+        "200":
+          description: Successful response with order history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    userId:
+                      type: integer
+                      example: 2
+                    totalPrice:
+                      type: string
+                      example: "798.97"
+                    status:
+                      type: string
+                      example: "pending"
+                    createdAt:
+                      type: string
+                      format: date-time
+                      example: "2025-02-19T08:31:03.315Z"
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      example: "2025-02-19T08:31:03.316Z"
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          orderId:
+                            type: integer
+                            example: 1
+                          productId:
+                            type: integer
+                            example: 1
+                          quantity:
+                            type: integer
+                            example: 3
+                          price:
+                            type: string
+                            example: "199.99"
+                          product:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              name:
+                                type: string
+                                example: "Product A"
+                              price:
+                                type: string
+                                example: "199.99"
+                              imageUrl:
+                                type: string
+                                example: "https://res.cloudinary.com/du0o9yluc/image/upload/v1739884825/products/mhky2uvzlwyz4wcodluv.png"
+        "422":
+          description: Error retrieving order history
+  /auth/createadmin:
+    post:
+      summary: Create a new admin
+      description: Only an existing admin can create another admin.
+      tags:
+        - Auth
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "Arun"
+                email:
+                  type: string
+                  format: email
+                  example: "arunpandian@example.com"
+                password:
+                  type: string
+                  format: password
+                  example: "securepassword123"
+      responses:
+        "201":
+          description: Admin registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Admin registered successfully"
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "5684ee92-d75a-4636-98d4-a34f1c74bb31"
+                      username:
+                        type: string
+                        example: "Arun"
+                      email:
+                        type: string
+                        example: "arunpandian@example.com"
+                      role:
+                        type: string
+                        example: "admin"
+        "403":
+          description: Access denied. Admins only.
+        "400":
+          description: All fields (username, email, password) are required
+        "409":
+          description: Email is already in use
+        "500":
+          description: An error occurred while registering user
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

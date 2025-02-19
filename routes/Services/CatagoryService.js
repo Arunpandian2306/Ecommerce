@@ -13,7 +13,7 @@ export const createCategory = async (req, res) => {
   } catch (error) {
     console.error("Error creating category:", error);
     res
-      .status(500)
+      .status(422)
       .json({ message: "Error creating category", error: error.message });
   }
 };
@@ -34,7 +34,7 @@ export const updateCategory = async (req, res) => {
 
     res.json(category);
   } catch (error) {
-    res.status(500).json({ message: "Error updating category", error });
+    res.status(422).json({ message: "Error updating category", error });
   }
 };
 
@@ -50,7 +50,7 @@ export const deleteCategory = async (req, res) => {
     await category.destroy();
     res.json({ message: "Category deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting category", error });
+    res.status(422).json({ message: "Error deleting category", error });
   }
 };
 
@@ -59,6 +59,6 @@ export const listCategories = async (_req, res) => {
     const categories = await CategoryModel.findAll();
     res.json(categories);
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving categories", error });
+    res.status(422).json({ message: "Error retrieving categories", error });
   }
 };

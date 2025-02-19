@@ -38,7 +38,7 @@ export const createProduct = async (req, res) => {
   } catch (error) {
     console.error("Error creating product:", error);
     res
-      .status(500)
+      .status(422)
       .json({ message: "Error creating product", error: error.message });
   }
 };
@@ -70,7 +70,7 @@ export const updateProduct = async (req, res) => {
 
     res.json({ message: "Product updated", product });
   } catch (error) {
-    res.status(500).json({ message: "Error updating product", error });
+    res.status(422).json({ message: "Error updating product", error });
   }
 };
 
@@ -89,7 +89,7 @@ export const deleteProduct = async (req, res) => {
     await product.destroy();
     res.json({ message: "Product deleted" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting product", error });
+    res.status(422).json({ message: "Error deleting product", error });
   }
 };
 
@@ -98,7 +98,7 @@ export const listProducts = async (req, res) => {
     const products = await ProductModel.findAll();
     res.json(products);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching products", error });
+    res.status(422).json({ message: "Error fetching products", error });
   }
 };
 
@@ -155,6 +155,6 @@ export const getProducts = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error fetching products", error });
+    res.status(422).json({ message: "Error fetching products", error });
   }
 };
