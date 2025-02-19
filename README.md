@@ -14,4 +14,11 @@ Install postgress and Pgadmin
 
 Create Data base as : ecommerce
 
-restore the dump in path : 
+restore the dump in path : router/Dump/Ecommerce.sql
+
+Then to run API Use
+-- npm run dev
+
+
+Swagger API Documentation
+https://app.swaggerhub.com/apis-docs/arun-a90/Ecommerce/1.0.0#/
