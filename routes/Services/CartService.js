@@ -27,6 +27,27 @@ export const createCart = async (req, res) => {
   }
 };
 
+export const updateCartQuantity = async (req, res) => {
+  try {
+    const { userId, productId, quantity } = req.body;
+    const cartItem = await CartModel.findOne({
+      where: { userId, productId },
+    });
+
+    if (!cartItem) {
+      return res.status(404).json({ message: "Cart item not found" });
+    }
+
+    cartItem.quantity = quantity;
+    await cartItem.save();
+
+    res.json({ message: "Cart quantity updated successfully" });
+  } catch (error) {
+    console.error("Error updating cart quantity:", error);
+    res.status(500).json({ message: "Error updating cart quantity", error });
+  }
+};
+
 export const viewCart = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -41,7 +62,12 @@ export const viewCart = async (req, res) => {
       ],
     });
 
-    res.json(cartItems);
+    const updatedCartItems = cartItems.map((item) => ({
+      ...item.toJSON(),
+      totalPrice: item.quantity * item.product.price,
+    }));
+
+    res.json(updatedCartItems);
   } catch (error) {
     console.error("Error retrieving cart:", error);
     res.status(500).json({ message: "Error retrieving cart", error });
