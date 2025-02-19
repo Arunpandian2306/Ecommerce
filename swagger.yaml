@@ -1,0 +1,528 @@
+openapi: 3.0.0
+info:
+  title: User Authentication API
+  description: API for user authentication and product management
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      description: Creates a new user account and returns an authentication token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: adminUser2
+                email:
+                  type: string
+                  format: email
+                  example: admin2@example.com
+                password:
+                  type: string
+                  format: password
+                  example: admin1Password
+      responses:
+        '200':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User registered successfully
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "3109ae09-feff-4571-9bf2-b6b5ce605260"
+                      username:
+                        type: string
+                        example: adminUser2
+                      email:
+                        type: string
+                        format: email
+                        example: admin2@example.com
+                      role:
+                        type: string
+                        example: customer
+        '400':
+          description: Bad request, invalid input data
+        '409':
+          description: Conflict, user already exists
+  /login:
+    post:
+      summary: User Login
+      description: Authenticates a user and returns access tokens.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: john.doe@example.com
+                password:
+                  type: string
+                  format: password
+                  example: securepassword123
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Login successful
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  accessToken:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  refreshToken:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "9496763c-f44c-46bf-b311-e500a18bae07"
+                      email:
+                        type: string
+                        format: email
+                        example: john.doe@example.com
+                      role:
+                        type: string
+                        example: admin
+        '400':
+          description: Invalid credentials
+  /category/create:
+    post:
+      summary: Create a new category
+      description: Creates a new product category.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: toy cars
+                description:
+                  type: string
+                  example: Category for toy products
+      responses:
+        '200':
+          description: Category created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 2
+                  name:
+                    type: string
+                    example: toy cars
+                  description:
+                    type: string
+                    example: Category for toy products
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: 2025-02-18T07:50:55.451Z
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    example: 2025-02-18T07:50:55.451Z
+        '400':
+          description: Bad request, invalid input data
+  /category/list:
+    get:
+      summary: Retrieve list of categories
+      description: This endpoint returns all available categories.
+      responses:
+        '200':
+          description: A list of categories.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: The ID of the category.
+                      example: 1
+                    name:
+                      type: string
+                      description: The name of the category.
+                      example: "Bat and ball"
+                    description:
+                      type: string
+                      description: A brief description of the category.
+                      example: "Category for Bags products"
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp when the category was created.
+                      example: "2025-02-18T07:50:07.823Z"
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp when the category was last updated.
+                      example: "2025-02-18T07:50:07.823Z"
+  /category/{id}:
+    put:
+      summary: Update a category by ID
+      description: This endpoint updates the details of an existing category based on the provided ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the category to be updated.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The updated name of the category.
+                  example: "Updated Electronics"
+                description:
+                  type: string
+                  description: The updated description of the category.
+                  example: "Updated category description"
+      responses:
+        '200':
+          description: The updated category details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: The ID of the category.
+                    example: 2
+                  name:
+                    type: string
+                    description: The name of the category.
+                    example: "Updated Electronics"
+                  description:
+                    type: string
+                    description: The description of the category.
+                    example: "Updated category description"
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp when the category was created.
+                    example: "2025-02-18T07:50:55.451Z"
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp when the category was last updated.
+                    example: "2025-02-18T14:04:44.219Z"
+    delete:
+      summary: Delete a category by ID
+      description: This endpoint deletes the category with the specified ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the category to be deleted.
+      responses:
+        '200':
+          description: Confirmation message that the category was deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Category deleted successfully"
+  /product/create:
+    post:
+      summary: Create a new product
+      description: This endpoint creates a new product and uploads an image.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name of the product.
+                  example: "Product A"
+                description:
+                  type: string
+                  description: A description of the product.
+                  example: "High-quality product"
+                price:
+                  type: number
+                  format: float
+                  description: The price of the product.
+                  example: 199.99
+                stock:
+                  type: integer
+                  description: The available stock for the product.
+                  example: 10
+                categoryId:
+                  type: integer
+                  description: The ID of the category the product belongs to.
+                  example: 1
+                image:
+                  type: string
+                  format: binary
+                  description: The product image to be uploaded.
+      responses:
+        '200':
+          description: The newly created product with the uploaded image URL.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 101
+                  name:
+                    type: string
+                    example: "Product A"
+                  description:
+                    type: string
+                    example: "High-quality product"
+                  price:
+                    type: number
+                    format: float
+                    example: 199.99
+                  stock:
+                    type: integer
+                    example: 10
+                  categoryId:
+                    type: integer
+                    example: 1
+                  imageUrl:
+                    type: string
+                    example: "https://example.com/images/product_a.png"
+        '400':
+          description: Invalid input or missing required fields
+  /product/getProducts:
+    get:
+      summary: Retrieve a list of products
+      description: This endpoint retrieves a list of all products with optional filters.
+      parameters:
+        - in: query
+          name: categoryId
+          required: false
+          schema:
+            type: integer
+          description: Filter products by category ID.
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            example: 10
+          description: The number of products to return.
+        - in: query
+          name: offset
+          required: false
+          schema:
+            type: integer
+            example: 0
+          description: The starting point from which to fetch products.
+      responses:
+        '200':
+          description: A list of products with the requested filters.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 101
+                    name:
+                      type: string
+                      example: "Product A"
+                    description:
+                      type: string
+                      example: "High-quality product"
+                    price:
+                      type: number
+                      example: 199.99
+                    stock:
+                      type: integer
+                      example: 10
+                    categoryId:
+                      type: integer
+                      example: 1
+                    imageUrl:
+                      type: string
+                      example: "https://example.com/images/product_a.png"
+        '400':
+          description: Invalid filter parameters
+        '404':
+          description: No products found matching the criteria
+  /product/{id}:
+    get:
+      summary: Get product details by ID
+      description: This endpoint retrieves the details of a product by its ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the product to retrieve.
+      responses:
+        '200':
+          description: The details of the requested product.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 101
+                  name:
+                    type: string
+                    example: "Product A"
+                  description:
+                    type: string
+                    example: "High-quality product"
+                  price:
+                    type: number
+                    example: 199.99
+                  stock:
+                    type: integer
+                    example: 10
+                  categoryId:
+                    type: integer
+                    example: 1
+                  imageUrl:
+                    type: string
+                    example: "https://example.com/images/product_a.png"
+        '404':
+          description: Product not found
+  /product/{_id}:
+    put:
+      summary: Update an existing product
+      description: This endpoint updates the details of an existing product by its ID.
+      parameters:
+        - in: path
+          name: _id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the product to be updated.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Updated Product"
+                description:
+                  type: string
+                  example: "Updated product description"
+                price:
+                  type: number
+                  example: 150.00
+                stock:
+                  type: integer
+                  example: 20
+                categoryId:
+                  type: integer
+                  example: 2
+      responses:
+        '200':
+          description: The updated product details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 101
+                  name:
+                    type: string
+                    example: "Updated Product"
+                  description:
+                    type: string
+                    example: "Updated product description"
+                  price:
+                    type: number
+                    example: 150.00
+                  stock:
+                    type: integer
+                    example: 20
+                  categoryId:
+                    type: integer
+                    example: 2
+        '400':
+          description: Bad request due to invalid data
+  /product/{:id}:
+    delete:
+      summary: Delete a product by ID
+      description: This endpoint deletes a product by its ID.
+      parameters:
+        - in: path
+          name: :id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the product to be deleted.
+      responses:
+        '200':
+          description: Confirmation message that the product was deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Product deleted successfully"

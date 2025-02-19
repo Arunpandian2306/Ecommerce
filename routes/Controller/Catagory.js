@@ -12,6 +12,6 @@ const router = express.Router();
 router.post("/create", authorizeAdmin, createCategory);
 router.put("/:id", authorizeAdmin, updateCategory);
 router.delete("/:id", authorizeAdmin, deleteCategory);
-router.get("/", authorizeAdmin, listCategories);
+router.get("/list", authorizeAdmin, listCategories);
 
 export default router;
