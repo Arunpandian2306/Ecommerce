@@ -1,5 +1,12 @@
 Backend setup
 
+### 🎯 Project Objectives
+✅ Provide a seamless shopping experience.
+✅ Implement user authentication (admin, customer).
+✅ Enable product search, filtering, and sorting.
+✅ Support cart & order management.
+✅ order history
+
 ### Installation
 ```bash
 git clone https://github.com/Arunpandian2306/Ecommerce.git
